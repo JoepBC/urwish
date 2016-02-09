@@ -1,9 +1,9 @@
 # urwish, a python3 library for creating linear text-based forms
-A *wrapper for urwid* (www.urwid.org) to create forms easily and efficiently. The original urwid library can do way much more in a powerful way, but for the creation of simple/linear data management forms it can be quite a struggle to address. *urwish* is rather limited, but _VERY_ easy.
+A **wrapper for urwid** (www.urwid.org) to create forms easily and efficiently. The original urwid library can do way much more in a powerful way, but for the creation of simple/linear data management forms it can be quite a struggle to address. **urwish** is rather limited, but _VERY_ easy.
 
 _Requires library: urwid_
 
-More details (and comments) on the example below in urwish_example.py (https://github.com/JoepBC/urwish/blob/master/urwish_example.py).
+More details (and comments) on the **example below** in *urwish_example.py* (https://github.com/JoepBC/urwish/blob/master/urwish_example.py).
 
 ![Example screenshot](https://github.com/JoepBC/urwish/blob/master/urwish_example_screenshot.png "Screenshot")
 
@@ -29,3 +29,5 @@ wish.add_input("text", descr="... there was just plain text.")
 wish.add_input("buttonrow", "extra_buttons", ['Fin', 'End', 'Schluss'])
 wish.run();
 ```
+
+**Reading the user input is even easier! (see example source)**
