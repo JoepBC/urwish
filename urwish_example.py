@@ -66,5 +66,18 @@ keys = ["user", "terminal", "checkbox_only", "drink", "btn1", "btn2",
 for a_key in keys:
 	print(a_key, "produced value:", wish.get_value(a_key))
 
+'''
+EXAMPLE OUTPUT AFTER CLICKING OK AT THE FORM:
+
+user produced value: Jane Doe
+terminal produced value: True
+checkbox_only produced value: False
+drink produced value: wine
+btn1 produced value: False
+btn2 produced value: False
+programming_languages produced value: ['Smalltalk']
+extra_buttons produced value: None
+'''
+
 # Check the implementation of urwish.define_attributes() in urwid.py for 
 #    suggestions to change the appearance.
