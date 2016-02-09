@@ -91,9 +91,9 @@ class UrwishWidgetsBase(object):
 		listbox = urwid.ListBox(listwalker)
 		pad = urwid.LineBox(urwid.Padding(listbox, left=1, right=1))
 		top = urwid.Overlay(pad, urwid.SolidFill(u'\N{MEDIUM SHADE}'),
-		    align='center', width=('relative', 60),
-		    valign='middle', height=('relative', 60),
-		    min_width=20, min_height=9)
+		    align='center', width=('relative', 80),
+		    valign='middle', height=('relative', 80),
+		    min_width=20, min_height=24)
 		return top, listwalker
 
 	def urwid_twocol_field(self, widget, leftcol_text, equal_space=True, width_first_col=None, leftcol_suffix=": "):
