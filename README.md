@@ -1,4 +1,6 @@
-# urwish
+# urwish, a python3 library.
 A wrapper for urwid (www.urwid.org) to create forms easily and efficiently.
 
-Perform the examples in urwish_example.py to get started (also listed in urwid.py)
+Requires library: urwid
+
+Run the example in urwish_example.py (https://github.com/JoepBC/urwish/blob/master/urwish_example.py) to get started.
