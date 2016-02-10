@@ -158,7 +158,7 @@ class UrwishWidgetsBase(object):
 class Urwish(UrwishWidgetsBase):
 
 	def __init__(self, title):
-		self.window, self.listwalker = self.urwid_listbox_window('Configuration setup')
+		self.window, self.listwalker = self.urwid_listbox_window(title)
 		
 		# CREATE MAIN COLLECTIONS:
 		#   The descriptive data (a list: descr, value, widgettype, urwidget) is stored here
@@ -220,6 +220,8 @@ class Urwish(UrwishWidgetsBase):
 
 	def create_fields(self):
 		self.descr_colwidth = self.get_descr_col_width()
+		# Remove items from list (if any), necessary if create_fields is called twice.
+		del self.listwalker[:]
 		for widkey in self.widgetlist:
 			self.listwalker.append(self.create_widget(widkey))
 
@@ -444,7 +446,7 @@ class Urwish(UrwishWidgetsBase):
 		return maxlen
 		
 	def get_descr_col_width(self):
-		maxlen = 0
+		maxlen = len(self.submit_button_leftcol_text)
 		for widkey in self.widgetlist:
 			if self.get_widget_type(widkey) in self.twocol_types:
 				maxlen = max(maxlen, self.get_line_len(self.widget_specs[widkey]["descr"]))
