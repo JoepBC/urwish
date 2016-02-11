@@ -6,71 +6,6 @@
 #  the Urwid library, www.urwid.org
 ###############################################################
 
-''' EXAMPLE urwish USAGE:
-from urwish import *
-from collections import OrderedDict
-
-# Create a new urwish form with a title:
-wish = Urwish("Just some examples.")
-
-# urwish input parameters order: input_type, assign_key, description, default_value
-
-# Create an edit field:
-wish.add_input("edit", "user", "Your name", "Jane Doe")
-# Get answer (str) after run: wish.get_value("user")
-
-# Create a set of radiobuttons using a radiolist. The values can be assigned
-#    using a list (by default checking the first item) or as a dictionary
-#    of keys and booleans (the last "True" will be selected). Use an OrderedDict 
-#    when you want the items of the dictionary to be presented in the right order.
-#    Study the "checklist" type below for an OrderedDict example.
-wish.add_input("radiolist", "drink", "You must choose", ["beer", "wine", "coffee"])
-# Get answer (str) after run: wish.get_value("drink")
-#    (answer will be "beer", "wine" or "coffee")
-
-# You may add extra submit buttons too:
-wish.add_input("button", "btn1", "An extra submit button")
-wish.add_input("button", "btn2", "Or try this one", "Click me")
-# Find out if button was clicked (bool): wish.get_value(key)
-
-# Add a list of checkboxes. 
-wish.add_input("checklist", "programming_languages", "I love to develop", 
-	OrderedDict([("python",False), ("Smalltalk",True), ("C++",False), ("Java",False)]))
-# Get answer (list of strings): wish.get_value("programming_languages")
-
-# Create a single checkbox with text left and checkbox right, the "edit field" style:
-wish.add_input("twocolcheckbox", "terminal", "Loves the terminal", True)
-# Get answer (bool) after run: wish.get_value("terminal")
-
-# Create a classic, but layout messing, checkbox: check first, description after:
-wish.add_input("checkbox", "checkbox_only", "This classic checkbox should be used\nin checkbox-only forms for layout reasons", False)
-# Get answer (bool) after run: wish.get_value("checkbox_only")
-
-# Or no text at all, just a horizontal spacer/divider. Does not return a value, no need for key assignment.
-wish.add_input("spacer")
-
-# Add some static text. Does not return a value, no need for key assignment.
-wish.add_input("text", descr="Once upon a time...")
-wish.add_input("text", descr="... there was just plain text.")
-
-# Add a full row of additional buttons to end the form with:
-wish.add_input("buttonrow", "extra_buttons", ['Fin', 'End', 'Schluss'])
-# Find out which button was clicked (str): wish.get_value("extra_buttons")
-#    (returns one of the values 'Fin', 'End' and 'Schluss', or None if another
-#     submit button was used to end the form.)
-
-wish.run();
-
-# (after the run(), start reading the get_value(key) output)
-keys = ["user", "terminal", "checkbox_only", "drink", "btn1", "btn2", 
-	"programming_languages", "extra_buttons"]
-for a_key in keys:
-	print(a_key, "produced value:", wish.get_value(a_key))
-
-# Check the implementation of urwish.define_attributes() in urwid.py for 
-#    suggestions to change the appearance.
-'''
-
 
 import urwid
 import time
@@ -85,14 +20,14 @@ class UrwishWidgetsBase(object):
 		   an AttrMap wrapper.'''
 		return urwid.AttrMap(item, None, focus_map='reversed')
 
-	def urwid_listbox_window(self, title_string):
+	def urwid_listbox_window(self, title_string=""):
 		body = [urwid.Text(title_string, align='center'), urwid.Divider()]
 		listwalker = urwid.SimpleFocusListWalker(body)
 		listbox = urwid.ListBox(listwalker)
 		pad = urwid.LineBox(urwid.Padding(listbox, left=1, right=1))
 		top = urwid.Overlay(pad, urwid.SolidFill(u'\N{MEDIUM SHADE}'),
 		    align='center', width=('relative', 80),
-		    valign='middle', height=('relative', 80),
+		    valign='middle', height=('relative', 85),
 		    min_width=20, min_height=24)
 		return top, listwalker
 
@@ -157,17 +92,28 @@ class UrwishWidgetsBase(object):
 
 class Urwish(UrwishWidgetsBase):
 
-	def __init__(self, title):
+	def __init__(self, title=""):
 		self.window, self.listwalker = self.urwid_listbox_window(title)
 		
 		# CREATE MAIN COLLECTIONS:
 		#   The descriptive data (a list: descr, value, widgettype, urwidget) is stored here
 		self.widget_specs = {}
 		#   The order of the list by keys
-		self.widgetlist = []
+		self.widget_list = []
 		
 		# PERFORM SOME INITIALISATION
 		self.define_attributes()
+
+	def __repr__(self):
+		return self.__str__("An Urwish form with values:\n")
+
+	def __str__(self, retstr = "Urwish values:\n"):
+		#retstr = "Urwish values:\n"
+		def xstr(s):
+			return '' if s is None else str(s)
+		for a_widget in self.widget_list:
+			retstr += ("  [" + str(a_widget) + "] == " + xstr(self.get_value(a_widget))+"\n")
+		return retstr
 
 	def define_attributes(self):
 		# End every value on the left column with this string.
@@ -189,23 +135,31 @@ class Urwish(UrwishWidgetsBase):
 		# button is pressed, this value will be set to "default".
 		self.button_pressed = None
 
+	def get(self, *args, **kwargs):
+		return self.get_value(*args, **kwargs)
+
+	def add(self, *args, **kwargs):
+		return self.add_input(*args, **kwargs)
+
 	def add_input(self, widget_type, assign_key=None, descr="", value=""):
 		if assign_key == None:
 			assign_key = time.time()
 			# But using fast systems, two equal timestamps might be created
 			# Make sure this is prevented.
-			while (assign_key in self.widgetlist):
+			while (assign_key in self.widget_list):
 				assign_key = time.time()
-		if assign_key in self.widgetlist:
-			print("WARNING: Key {",assign_key,"} already present in widgetlist. Now overwriting, might cause errors.")
+		if assign_key in self.widget_list:
+			print("WARNING: Key {",assign_key,"} already present in widget_list. Now overwriting, might cause errors.")
 		self.widget_specs[assign_key] = {"descr":descr, "value":value, "type":widget_type}
 		# The list has all the widgets in the urwid menu in the right order (whereas dictionaries are unordered)
-		self.widgetlist.append(assign_key)
+		self.widget_list.append(assign_key)
 
 	def set_widget(self, widkey, widget):
 		self.widget_specs[widkey]["urwidget"] = widget
 	def get_widget(self, widkey):
-		return self.widget_specs[widkey]["urwidget"]
+		if "urwidget" in self.widget_specs[widkey]:
+			return self.widget_specs[widkey]["urwidget"]
+		return None
 
 	def get_widget_type(self, key):
 		return self.widget_specs[key]["type"]
@@ -218,11 +172,19 @@ class Urwish(UrwishWidgetsBase):
 	def set_widget_value(self, key, value):
 		self.widget_specs[key]["value"] = value
 
+	def get_widget_result(self, key):
+		if "res" in self.widget_specs[key]:
+			return self.widget_specs[key]["res"]
+		return None
+	def set_widget_result(self, key, value):
+		self.widget_specs[key]["res"] = value
+
+
 	def create_fields(self):
 		self.descr_colwidth = self.get_descr_col_width()
 		# Remove items from list (if any), necessary if create_fields is called twice.
 		del self.listwalker[:]
-		for widkey in self.widgetlist:
+		for widkey in self.widget_list:
 			self.listwalker.append(self.create_widget(widkey))
 
 	def create_widget(self, widget_key):
@@ -278,6 +240,7 @@ class Urwish(UrwishWidgetsBase):
 
 
 	def create_button(self, widget_key):
+		'''create_button does not call .set_widget, as the widget contains no relevant data'''
 		leftcol_suffix = self.leftcol_default_suffix
 
 		first_col_text = self.button_firstcol_text(widget_key)
@@ -296,7 +259,7 @@ class Urwish(UrwishWidgetsBase):
 			self.urwid_twocol_button(first_col_text, button_text , 
 				equal_space=True, width_first_col=self.descr_colwidth, 
 				leftcol_suffix = leftcol_suffix)
-		self.set_widget_value(widget_key, False)
+		self.set_widget_result(widget_key, False)
 		urwid.connect_signal(button_widget, 'click', self.manual_button_click, widget_key)
 		return list_columns_item
 
@@ -309,7 +272,7 @@ class Urwish(UrwishWidgetsBase):
 		columns, button_list = \
 			self.urwid_buttonrow(button_caption_list)
 		for button in button_list:
-			self.set_widget_value(widget_key, None)
+			self.set_widget_result(widget_key, None)
 			urwid.connect_signal(button, 'click', self.buttonrow_click, widget_key)
 		return columns
 
@@ -365,21 +328,28 @@ class Urwish(UrwishWidgetsBase):
 			leftcol_suffix = self.leftcol_default_suffix)
 		self.set_widget(widget_key, radiogroup)
 		return list_columns_item
-		
+
+
 	def get_value(self, key):
+		# A "switch/case" kind of method. Behave according to the widget_type.
 		widget_type = self.get_widget_type(key)
+		if (widget_type == "button"):
+			return self.get_button_value(key)
+		if (widget_type == "buttonrow"):
+			return self.get_buttonrow_value(key)
+		# The widgets below need a widget set to read its value. If no widget is stored (e.g. before creation of the form), return None now.
+		widget = self.get_widget(key)
+		if widget == None:
+			return None
+		# Continue the normal procedure for returning values here.
 		if (widget_type == "edit"):
-			return self.get_input_value(key)
+			return self.get_edit_value(key)
 		if (widget_type == "checkbox" or widget_type=="twocolcheckbox"):
 			return self.get_checkbox_value(key)
 		if (widget_type == "radiolist"):
 			return self.get_radiolist_value(key)
 		if (widget_type == "checklist"):
 			return self.get_checklist_values(key)
-		if (widget_type == "button"):
-			return self.get_button_value(key)
-		if (widget_type == "buttonrow"):
-			return self.get_buttonrow_value(key)
 		# Default behaviour, return "value" from widget_specs dictionary.
 		return self.get_widget_value(key)
 
@@ -387,9 +357,9 @@ class Urwish(UrwishWidgetsBase):
 		return self.button_pressed == key
 
 	def get_buttonrow_value(self, key):
-		return self.get_widget_value(key)
+		return self.get_widget_result(key)
 
-	def get_input_value(self, key):		
+	def get_edit_value(self, key):
 		return self.get_widget(key).get_edit_text()
 
 	def get_checkbox_value(self, key):		
@@ -421,7 +391,7 @@ class Urwish(UrwishWidgetsBase):
 		self.listwalker.append(list_widget)
 
 	def buttonrow_click(self, button, widkey):
-		self.set_widget_value(widkey, button.label)
+		self.set_widget_result(widkey, button.label)
 		raise urwid.ExitMainLoop()
 
 	def manual_button_click(self, button, widkey):
@@ -447,7 +417,7 @@ class Urwish(UrwishWidgetsBase):
 		
 	def get_descr_col_width(self):
 		maxlen = len(self.submit_button_leftcol_text)
-		for widkey in self.widgetlist:
+		for widkey in self.widget_list:
 			if self.get_widget_type(widkey) in self.twocol_types:
 				maxlen = max(maxlen, self.get_line_len(self.widget_specs[widkey]["descr"]))
 			if self.get_widget_type(widkey) == "button":
@@ -456,9 +426,14 @@ class Urwish(UrwishWidgetsBase):
 		return (maxlen + 2)
 
 	def final_list(self):
+		# Add all widgets to the form
 		self.create_fields()
+		# When demanded, add submit button at the bottom
 		if self.show_default_button:
 			self.add_ok_button()
+		# Reset button pressed value
+		self.button_pressed = None
+
 
 	def show(self):
 		urwid.MainLoop(self.window, palette=[('reversed', 'standout', 'dark cyan')]).run()
