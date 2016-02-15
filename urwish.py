@@ -2,7 +2,7 @@
 
 ###############################################################
 # Urwish lib by Joep Bos-Coenraad (github.com/JoepBC)
-# An easy wrapper for making simple menus using \
+# An easy wrapper for making linear console forms using \
 #  the Urwid library, www.urwid.org
 ###############################################################
 
