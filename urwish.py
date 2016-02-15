@@ -181,6 +181,7 @@ class Urwish(UrwishWidgetsBase):
 
 
 	def create_fields(self):
+		# This method creates the fields in the ListWalker when all widget parameters have been defined. The "twocol" widgets must know the actual width of the largest left-column in order to have them properly aligned.
 		self.descr_colwidth = self.get_descr_col_width()
 		# Remove items from list (if any), necessary if create_fields is called twice.
 		del self.listwalker[:]
